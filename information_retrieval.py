@@ -1,6 +1,25 @@
 import re
 from stop_list import *
-queries = open( "cran.qry", 'r')
+queries = open( "cran.qry", 'r').read()
+
+print(queries)
+def get_query_nums(string):
+	query_nums = []
+	q1 = re.findall(r".I \d{3}", string)
+	for q in q1:
+		query_nums.append(q.replace(".I ", ""))
+	return(query_nums)
+
+def get_query_strings(string):
+	query_strings = []
+	q1 = re.findall(r".W\n[a-z ]+", string)
+	for q in q1:
+		query_strings.append(q.replace(".W ", ""))
+	return(query_strings)
+
+
+#print(get_query_nums(queries))
+print(get_query_strings(queries))
 
 def trim(string):
 	trimmed_words = (re.sub(r"([\d]|[.\,!?()\[\]\-\%@#$^*;\\\/\|<>\"\'_+=:{\}.])+", "", string)).split(" ")
@@ -24,7 +43,7 @@ def print_dict(dictionary):
 		print(key, value)
 
 #print(trim("Hello! [I'm!] Mc-cool! (Muahaha).... and over being diamons"))
-test = ("cat dog cat cat lemon").split(" ")
-print_dict(get_tf(test))
+#test = ("cat dog cat cat lemon").split(" ")
+#print_dict(get_tf(test))
 
 

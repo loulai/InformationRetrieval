@@ -8,19 +8,23 @@ def trim(string):
 	for stop_word in stop_words:
 		while stop_word in trimmed_words: 
 			trimmed_words.remove(stop_word)
-	print(trimmed_words)
 	return(trimmed_words)
 
-#def get_tf(string):
+def get_tf(array):
+	# takes an array of terms without punctuation and stopwords
+	terms = list(set(array))#unique
+	term_frequency = dict.fromkeys(terms, 0) #dict with default value 0
+	for word in array:
+		term_frequency[word] = term_frequency[word] + 1
 
-'''
-	line = line.strip("\n")		
-	p = line.split("\t")
-	if len(p) == 1:
-		continue
-	words.append(p[0])
-	tags.append(p[1])
-'''
+	return term_frequency
+
+def print_dict(dictionary):
+	for key, value in dictionary.items():
+		print(key, value)
+
+#print(trim("Hello! [I'm!] Mc-cool! (Muahaha).... and over being diamons"))
+test = ("cat dog cat cat lemon").split(" ")
+print_dict(get_tf(test))
 
 
-trim("Hello! [I'm!] Mc-cool! (Muahaha).... and over being diamons")

@@ -34,7 +34,7 @@ def trim(string):
 
 def get_tf(array):
 	# takes an array of terms without punctuation and stopwords
-	terms = list(set(array))#unique
+	terms = list(set(array)) #unique
 	term_frequency = dict.fromkeys(terms, 0) #dict with default value 0
 	for word in array:
 		term_frequency[word] = term_frequency[word] + 1

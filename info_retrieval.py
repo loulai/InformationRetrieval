@@ -38,28 +38,42 @@ def countDocsContainingWord(one_word, corpus_as_array):
 			numDocsContainingWord = numDocsContainingWord + 1
 	return numDocsContainingWord
 
-def getIDF(word, corpus_as_array):
-	numDocs = len(corpus_as_array)
-	numDocsContainingWord = countDocsContainingWord(word, corpus_as_array)
-	if(numDocsContainingWord == 0):
-		print(word)
-		print("OOV")
-		idf = 0
-	else:
-		idf = math.log(numDocs / numDocsContainingWord)
-		#print("ln(%d/%d)" % (numDocs, numDocsContainingWord)) //DB
-	print idf # common (225/110) = 0.69, rare (225/1) = 5.4
-
-def getTF(target_word, doc):
+def getTF(word, doc):
 	termFreq = 0;
 	for doc_word in doc:
-		if(doc_word == target_word):
+		if(doc_word == word):
 			termFreq = termFreq + 1
 	return termFreq
 
+def getIDF(word, corpus_as_array):
+	idf = 0.0
+	numDocs = len(corpus_as_array)
+	numDocsContainingWord = countDocsContainingWord(word, corpus_as_array)
+	if(numDocsContainingWord == 0):
+		printf("OOV: %s"%word)
+	else:
+		idf = math.log(numDocs / numDocsContainingWord)
+		#print("=====\nnumDocsContainingWord = %d" % numDocsContainingWord) #DB
+		#print("ln(%d/%d)\n=====" % (numDocs, numDocsContainingWord)) #DB
+	return idf # common (225/110) = 0.69, rare (225/1) = 5.4
+
+def getTFIDF(word, target_file, corpus):
+	tf = getTF(word, target_file)
+	idf = getIDF(word, corpus)
+	tfidf = tf * idf
+	return tfidf
+
 queries_corpus = clean(get_queries(corpus_as_string))
-tf = getTF("similarity", queries_corpus[1])
-print(tf)
+target_word = "similarity"
+target_query = queries_corpus[0]
+target_corpus = queries_corpus
+
+tf = getTF(target_word, target_query)
+idf = getIDF(target_word, target_corpus)
+tfidf = getTFIDF(target_word, target_query, target_corpus)
+print("TF    = %3d\nIDF   = %3.2f\ntfidf = %3.2f" % (tf, idf, tfidf))
+
+
 
 #ifd = getIDF("flight", queries_corpus)
 #print("hello " == "hello ")

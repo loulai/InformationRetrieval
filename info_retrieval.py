@@ -65,23 +65,30 @@ def getTFIDF(word, target_file, corpus):
 	return tfidf
 
 def getUniqueWords(corpus): #corpus is array of arrays
-	giant_words = []
+	unique_words = []
 	for doc in corpus:
 		for words in doc:
-			giant_words.append(words) # one giant list of words
-	giant_words = list(set(giant_words)) # unique words
-	return giant_words
+			unique_words.append(words) # one giant list of words
+	unique_words = list(set(unique_words)) # unique words
+	# print(unique_words) # DB
+	return unique_words
 
 def createTFIDFMatrix(corpus):
 	unique_words = getUniqueWords(corpus)
 	keys = []
 	for i in xrange(len(corpus)):
 		keys.append(i+1)
-	columnsMap = {}
 
+	# initializing hashmap
+	columnsMap = {}
 	for k in xrange(len(corpus)):
-   		columnsMap[keys[k]] = corpus[k]
+   		columnsMap[keys[k]] = [0] * len(unique_words)
 	
+	for j in xrange(len(corpus)):
+		for m in xrange(len(unique_words)):
+			currentWord = unique_words[m]
+			tfidf = getTFIDF(currentWord, corpus[j], corpus)
+			columnsMap[j+1][m] = tfidf
 	print columnsMap
 
 queries_corpus = clean(get_queries(corpus_as_string))
@@ -91,7 +98,7 @@ createTFIDFMatrix(queries_corpus)
 '''
 public TFIDF addTFIDF() {
 
-	for(int i = 0; i< nCol; i++) {
+	for(int i = 0; i < nCol; i++) {
 		for(int k=0; k< nRow; k++) {
 			String currentWord = uniqueTerms.get(k);
 			double tfidf = getTFIDF(currentWord, mainCorpus[i], mainCorpus);

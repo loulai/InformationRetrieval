@@ -2,6 +2,7 @@ import re
 from stop_list import *
 import math
 import sys
+import numpy as np
 corpus_as_string = open( "cran.qry", 'r').read().replace("\n", "").replace("\r", " ")
 corpus_as_string2 = open( "cran2.qry", 'r').read().replace("\n", "").replace("\r", " ")
 
@@ -12,7 +13,7 @@ def get_queries(corpus_as_string):
 	# ['this is one . ', 'this is two . ']
 	
 	for i in xrange(len(corpus_as_array)):
-	 	corpus_as_array[i] = corpus_as_array[i].replace(" . ", " ").replace(",", "").replace("?", "").replace("!", "") # replace ' . ' >> ['this is one', 'this is two']
+	 	corpus_as_array[i] = corpus_as_array[i].replace(" . ", " ").replace(",", "").replace("?", "").replace("!", "").replace(")", "").replace("(", "") # replace ' . ' >> ['this is one', 'this is two']
 	 	corpus_as_array[i] = filter(None, corpus_as_array[i].split(" ")) # split into words >> [['this', 'is', 'one'], ['this', 'is', 'two'] ]	 	
 	return corpus_as_array
 
@@ -62,6 +63,46 @@ def getTFIDF(word, target_file, corpus):
 	idf = getIDF(word, corpus)
 	tfidf = tf * idf
 	return tfidf
+
+def getUniqueWords(corpus): #corpus is array of arrays
+	giant_words = []
+	for doc in corpus:
+		for words in doc:
+			giant_words.append(words) # one giant list of words
+	giant_words = list(set(giant_words)) # unique words
+	return giant_words
+
+def createTFIDFMatrix(corpus):
+	unique_words = getUniqueWords(corpus)
+	keys = []
+	for i in xrange(len(corpus)):
+		keys.append(i+1)
+	columnsMap = {}
+
+	for k in xrange(len(corpus)):
+   		columnsMap[keys[k]] = corpus[k]
+	
+	print columnsMap
+
+queries_corpus = clean(get_queries(corpus_as_string))
+createTFIDFMatrix(queries_corpus)
+
+
+'''
+public TFIDF addTFIDF() {
+
+	for(int i = 0; i< nCol; i++) {
+		for(int k=0; k< nRow; k++) {
+			String currentWord = uniqueTerms.get(k);
+			double tfidf = getTFIDF(currentWord, mainCorpus[i], mainCorpus);
+			
+			//update
+			columnsMap.get(String.valueOf(i)).set(k,  tfidf);
+		}
+	}
+	return this;
+}
+'''
 
 queries_corpus = clean(get_queries(corpus_as_string))
 target_word = "similarity"

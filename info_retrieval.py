@@ -8,7 +8,8 @@ queries_as_string2 = open( "cran2.qry", 'r').read().replace("\n", "").replace("\
 abstracts_as_string2 = open( "cran.all.14002", 'r').read().replace("\n", " ").replace("\r", " ")
 #line breaks removed, everything compressed into one string
 
-def clean(corpus_as_array):
+######### [cleaning methods]
+def clean(corpus_as_array): #private method 
 	i = 0
 	for doc in corpus_as_array:
 		for i in xrange(len(doc)):
@@ -47,25 +48,23 @@ def get_abstracts(corpus_as_string):
 	corpus_as_array = clean(corpus_as_array)
 	return corpus_as_array
 
-abstract_array = get_abstracts(abstracts_as_string2)
+######### [tfidf]
 
-print abstract_array
-
-def countDocsContainingWord(one_word, corpus_as_array):
-	numDocsContainingWord = 0
-	for doc in corpus_as_array:
-		if one_word in doc:
-			numDocsContainingWord = numDocsContainingWord + 1
-	return numDocsContainingWord
-
-def getTF(word, doc):
+def getTF(word, doc): #private
 	termFreq = 0;
 	for doc_word in doc:
 		if(doc_word == word):
 			termFreq = termFreq + 1
 	return termFreq
 
-def getIDF(word, corpus_as_array):
+def countDocsContainingWord(one_word, corpus_as_array): #private
+	numDocsContainingWord = 0
+	for doc in corpus_as_array:
+		if one_word in doc:
+			numDocsContainingWord = numDocsContainingWord + 1
+	return numDocsContainingWord
+
+def getIDF(word, corpus_as_array): #private
 	idf = 0.0
 	numDocs = len(corpus_as_array)
 	numDocsContainingWord = countDocsContainingWord(word, corpus_as_array)
@@ -77,13 +76,13 @@ def getIDF(word, corpus_as_array):
 		#print("ln(%d/%d)\n=====" % (numDocs, numDocsContainingWord)) #DB
 	return idf # common (225/110) = 0.69, rare (225/1) = 5.4
 
-def getTFIDF(word, target_file, corpus):
+def getTFIDF(word, target_file, corpus): #private
 	tf = getTF(word, target_file)
 	idf = getIDF(word, corpus)
 	tfidf = tf * idf
 	return tfidf
 
-def getUniqueWords(corpus): #corpus is array of arrays
+def getUniqueWords(corpus): #corpus is array of arrays #private
 	unique_words = []
 	for doc in corpus:
 		for words in doc:
@@ -98,22 +97,30 @@ def createTFIDFMatrix(corpus):
 	for i in xrange(len(corpus)):
 		keys.append(i+1)
 
-	# initializing hashmap
+	# initializing empty hashmap
 	columnsMap = {}
 	for k in xrange(len(corpus)):
    		columnsMap[keys[k]] = [0] * len(unique_words)
 	
+	# populating hashmap
 	for j in xrange(len(corpus)):
 		for m in xrange(len(unique_words)):
 			currentWord = unique_words[m]
 			tfidf = getTFIDF(currentWord, corpus[j], corpus)
 			columnsMap[j+1][m] = tfidf
-	print columnsMap
+	return columnsMap
 
 #######
 
+abstract_corpus2 = get_abstracts(abstracts_as_string2)
+abstract_TFIDF2 = createTFIDFMatrix(abstract_corpus2)
+
+queries_corpus2 = get_queries(queries_as_string2)
+queries_TFIDF2 = createTFIDFMatrix(queries_corpus2)
+print(queries_TFIDF)
+
 '''
-queries_corpus = cleanQuery(get_queries(corpus_as_string2))
+queries_corpus = get_queries(corpus_as_string2)
 target_word = "similarity"
 target_query = queries_corpus[0]
 target_corpus = queries_corpus

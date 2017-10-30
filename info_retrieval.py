@@ -3,19 +3,10 @@ from stop_list import *
 import math
 import sys
 import numpy as np
-corpus_as_string = open( "cran.qry", 'r').read().replace("\n", "").replace("\r", " ")
-corpus_as_string2 = open( "cran2.qry", 'r').read().replace("\n", "").replace("\r", " ")
-
-
-def get_queries(corpus_as_string):
-	corpus_as_array = re.split(".I \d{3} .W ", corpus_as_string) 
-	corpus_as_array = filter(None, corpus_as_array)
-	# ['this is one . ', 'this is two . ']
-	
-	for i in xrange(len(corpus_as_array)):
-	 	corpus_as_array[i] = corpus_as_array[i].replace(" . ", " ").replace(",", "").replace("?", "").replace("!", "").replace(")", "").replace("(", "") # replace ' . ' >> ['this is one', 'this is two']
-	 	corpus_as_array[i] = filter(None, corpus_as_array[i].split(" ")) # split into words >> [['this', 'is', 'one'], ['this', 'is', 'two'] ]	 	
-	return corpus_as_array
+queries_as_string = open( "cran.qry", 'r').read().replace("\n", "").replace("\r", " ")
+queries_as_string2 = open( "cran2.qry", 'r').read().replace("\n", "").replace("\r", " ")
+abstracts_as_string2 = open( "cran.all.14002", 'r').read().replace("\n", " ").replace("\r", " ")
+#line breaks removed, everything compressed into one string
 
 def clean(corpus_as_array):
 	i = 0
@@ -31,6 +22,34 @@ def clean(corpus_as_array):
 		corpus_as_array[i] = filter(None, corpus_as_array[i]) # remove blanks
 
 	return(corpus_as_array)
+
+def get_queries(corpus_as_string):
+	corpus_as_array = re.split(".I \d{3} .W ", corpus_as_string) 
+	corpus_as_array = filter(None, corpus_as_array)
+	# ['this is one . ', 'this is two . ']
+	
+	for i in xrange(len(corpus_as_array)):
+	 	corpus_as_array[i] = corpus_as_array[i].replace(" . ", " ").replace(",", "").replace("?", "").replace("!", "").replace(")", "").replace("(", "") # replace ' . ' >> ['this is one', 'this is two']
+	 	corpus_as_array[i] = filter(None, corpus_as_array[i].split(" ")) # split into words >> [['this', 'is', 'one'], ['this', 'is', 'two'] ]	 	
+	
+	corpus_as_array = clean(corpus_as_array)
+	return corpus_as_array
+
+def get_abstracts(corpus_as_string):
+	corpus_as_array = re.split(".I [^W]+\.W", corpus_as_string)
+	corpus_as_array = filter(None, corpus_as_array)
+	# ['experiment one .', 'experiment two .']
+
+	for i in xrange(len(corpus_as_array)):
+	 	corpus_as_array[i] = corpus_as_array[i].replace(" .", " ").replace(" . ", " ").replace(",", "").replace("?", "").replace("!", "").replace(")", "").replace("(", "").replace("\\", "").replace("/", "") #> ['this is one', 'this is two']
+	 	corpus_as_array[i] = filter(None, corpus_as_array[i].split(" ")) # split into words >> [['this', 'is', 'one'], ['this', 'is', 'two'] ]	 	
+	
+	corpus_as_array = clean(corpus_as_array)
+	return corpus_as_array
+
+abstract_array = get_abstracts(abstracts_as_string2)
+
+print abstract_array
 
 def countDocsContainingWord(one_word, corpus_as_array):
 	numDocsContainingWord = 0
@@ -91,27 +110,10 @@ def createTFIDFMatrix(corpus):
 			columnsMap[j+1][m] = tfidf
 	print columnsMap
 
-queries_corpus = clean(get_queries(corpus_as_string))
-createTFIDFMatrix(queries_corpus)
-
+#######
 
 '''
-public TFIDF addTFIDF() {
-
-	for(int i = 0; i < nCol; i++) {
-		for(int k=0; k< nRow; k++) {
-			String currentWord = uniqueTerms.get(k);
-			double tfidf = getTFIDF(currentWord, mainCorpus[i], mainCorpus);
-			
-			//update
-			columnsMap.get(String.valueOf(i)).set(k,  tfidf);
-		}
-	}
-	return this;
-}
-'''
-
-queries_corpus = clean(get_queries(corpus_as_string))
+queries_corpus = cleanQuery(get_queries(corpus_as_string2))
 target_word = "similarity"
 target_query = queries_corpus[0]
 target_corpus = queries_corpus
@@ -119,10 +121,10 @@ target_corpus = queries_corpus
 tf = getTF(target_word, target_query)
 idf = getIDF(target_word, target_corpus)
 tfidf = getTFIDF(target_word, target_query, target_corpus)
+createTFIDFMatrix(queries_corpus)
+
 print("TF    = %3d\nIDF   = %3.2f\ntfidf = %3.2f" % (tf, idf, tfidf))
-
-
-
+'''
 #ifd = getIDF("flight", queries_corpus)
 #print("hello " == "hello ")
 #numAre = countDocsContainingWord("", queries_corpus)

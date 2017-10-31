@@ -82,36 +82,53 @@ def getTFIDF(word, target_file, corpus): #private
 	tfidf = tf * idf
 	return tfidf
 
-def getUniqueWords(corpus): #corpus is array of arrays #private
+def getUniqueWords(doc): #corpus is array of arrays #private
 	unique_words = []
-	for doc in corpus:
-		for words in doc:
-			unique_words.append(words) # one giant list of words
+	
+	for words in doc:
+		unique_words.append(words) # one list of words
 	unique_words = list(set(unique_words)) # unique words
 	# print(unique_words) # DB
 	return unique_words
 
+#uniq = getUniqueWords("dog pet store dog dog".split(" "))
+#print(uniq)
+
 def createTFIDFMatrix(corpus):
-	unique_words = getUniqueWords(corpus)
+
+	# creating query keys 1 to 225
 	keys = []
 	for i in xrange(len(corpus)):
 		keys.append(i+1)
 
-	# initializing empty hashmap
 	columnsMap = {}
-	for k in xrange(len(corpus)):
-   		columnsMap[keys[k]] = [0] * len(unique_words)
-	
+	k = 0
+	for doc in corpus:
+		unique_words = getUniqueWords(doc)
+		# initializing empty vector for every doc
+		columnsMap[keys[k]] = [0] * len(unique_words)
+		k = k + 1
+		print(unique_words)
+
 	# populating hashmap
-	for j in xrange(len(corpus)):
-		for m in xrange(len(unique_words)):
-			currentWord = unique_words[m]
-			tfidf = getTFIDF(currentWord, corpus[j], corpus)
-			columnsMap[j+1][m] = tfidf
+	for c in xrange(len(corpus)):
+		unique_words = getUniqueWords(corpus[c]) # unique words per doc
+		for r in xrange(len(unique_words)):
+			currentWord = unique_words[r]
+			tfidf = getTFIDF(currentWord, corpus[c], corpus)
+			columnsMap[c+1][r] = tfidf
+	
 	return columnsMap
 
-#######
+#def printNice(columnsMap):
 
+
+queries_corpus2 = get_queries(queries_as_string2)
+queries_TFIDF2 = createTFIDFMatrix(queries_corpus2)
+print(queries_TFIDF2)
+
+#######
+'''
 abstract_corpus2 = get_abstracts(abstracts_as_string2)
 abstract_TFIDF2 = createTFIDFMatrix(abstract_corpus2)
 
@@ -119,7 +136,7 @@ queries_corpus2 = get_queries(queries_as_string2)
 queries_TFIDF2 = createTFIDFMatrix(queries_corpus2)
 print(queries_TFIDF)
 
-'''
+
 queries_corpus = get_queries(corpus_as_string2)
 target_word = "similarity"
 target_query = queries_corpus[0]

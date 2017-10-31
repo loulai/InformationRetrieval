@@ -52,8 +52,8 @@ def get_abstracts(corpus_as_string):
 
 def getTF(word, doc): #private
 	termFreq = 0;
-	for doc_word in doc:
-		if(doc_word == word):
+	for current_word in doc:
+		if(current_word == word):
 			termFreq = termFreq + 1
 	return termFreq
 
@@ -95,7 +95,6 @@ def getUniqueWords(doc): #corpus is array of arrays #private
 #print(uniq)
 
 def createTFIDFMatrix(corpus):
-
 	# creating query keys 1 to 225
 	keys = []
 	for i in xrange(len(corpus)):
@@ -117,15 +116,17 @@ def createTFIDFMatrix(corpus):
 			currentWord = unique_words[r]
 			tfidf = getTFIDF(currentWord, corpus[c], corpus)
 			columnsMap[c+1][r] = tfidf
-	
 	return columnsMap
 
 #def printNice(columnsMap):
 
-
 queries_corpus2 = get_queries(queries_as_string2)
 queries_TFIDF2 = createTFIDFMatrix(queries_corpus2)
 print(queries_TFIDF2)
+
+abstract_corpus2 = get_abstracts(abstracts_as_string2)
+abstract_TFIDF2 = createTFIDFMatrix(abstract_corpus2)
+print(abstract_TFIDF2)
 
 #######
 '''
